@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lecture Notes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap');
+
+  :root{
+    --paper:#F6F3EC;
+    --card:#FFFFFF;
+    --ink:#1E2A22;
+    --ink-soft:#5C6B60;
+    --line:#DEDACB;
+    --teal:#1F6F5C;
+    --teal-soft:#DCEBE6;
+    --amber:#C97A2B;
+    --amber-soft:#F4E3D0;
+    --red:#B23A2F;
+    --red-soft:#F3E1DE;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:'Inter',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    min-height:100vh;
+    padding:2.5rem 1.25rem;
+  }
+  .wrap{max-width:760px; margin:0 auto;}
+
+  header{
+    border-bottom:2px solid var(--ink);
+    padding-bottom:1rem;
+    margin-bottom:1.75rem;
+  }
+  .kicker{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    margin-bottom:.35rem;
+  }
+  h1{
+    font-family:'Source Serif 4',serif;
+    font-weight:700;
+    font-size:28px;
+    letter-spacing:-.01em;
+  }
+
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:1.5rem;
+    margin-bottom:1.5rem;
+  }
+  label.field-label{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:.5rem;
+  }
+  input[type="text"]{
+    width:100%;
+    font-family:'Inter',sans-serif;
+    font-size:15px;
+    padding:.7rem .9rem;
+    border:1px solid var(--line);
+    border-radius:8px;
+    background:#FCFBF7;
+    margin-bottom:1rem;
+  }
+  input[type="text"]:focus{outline:2px solid var(--teal); outline-offset:-1px;}
+
+  .record-row{
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    margin-bottom:1rem;
+    flex-wrap:wrap;
+  }
+  button.record-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    background:var(--teal);
+    color:#fff;
+    border:none;
+    padding:.85rem 1.5rem;
+    border-radius:30px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    gap:.6rem;
+    transition:background .15s;
+  }
+  button.record-btn:hover{background:#175647;}
+  button.record-btn.recording{background:var(--red);}
+  button.record-btn.recording:hover{background:#8f2e25;}
+  button.record-btn:disabled{opacity:.5; cursor:not-allowed;}
+  .dot{width:10px; height:10px; border-radius:50%; background:#fff;}
+  .dot.pulsing{animation:pulse 1.2s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
+
+  .timer{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:15px;
+    color:var(--ink-soft);
+  }
+
+  button.secondary-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    background:none;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+    padding:.6rem 1.1rem;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  button.secondary-btn:hover{border-color:var(--ink); color:var(--ink);}
+  button.secondary-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  button.primary-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:.7rem 1.4rem;
+    border-radius:8px;
+    cursor:pointer;
+  }
+  button.primary-btn:hover:not(:disabled){background:var(--teal);}
+  button.primary-btn:disabled{opacity:.45; cursor:not-allowed;}
+
+  .transcript-box{
+    font-family:'Source Serif 4',serif;
+    font-size:14.5px;
+    line-height:1.7;
+    color:var(--ink);
+    background:#FCFBF7;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:1rem 1.1rem;
+    max-height:220px;
+    overflow-y:auto;
+    white-space:pre-wrap;
+  }
+  .transcript-box.empty{color:var(--ink-soft); font-style:italic;}
+  .transcript-box .interim{color:var(--ink-soft);}
+
+  .warning-box{
+    background:var(--amber-soft);
+    border:1px solid var(--amber);
+    color:#7A4A16;
+    font-size:13px;
+    padding:.8rem 1rem;
+    border-radius:8px;
+    margin-bottom:1.5rem;
+  }
+  .error-box{
+    background:var(--red-soft);
+    border:1px solid var(--red);
+    color:var(--red);
+    font-size:13px;
+    padding:.8rem 1rem;
+    border-radius:8px;
+    margin-bottom:1.5rem;
+  }
+
+  .section-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:.6rem;
+    margin-top:1.5rem;
+  }
+  .section-label:first-of-type{margin-top:0;}
+
+  .notes-body{
+    font-family:'Source Serif 4',serif;
+    font-size:15px;
+    line-height:1.7;
+  }
+  .notes-body h3{
+    font-family:'Inter',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    color:var(--teal);
+    margin:1rem 0 .4rem;
+  }
+  .notes-body h3:first-child{margin-top:0;}
+  .notes-body ul{margin:0 0 .5rem 1.2rem;}
+  .notes-body li{margin-bottom:.3rem;}
+
+  .loading{display:none; align-items:center; gap:.6rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin:1rem 0;}
+  .loading.show{display:flex;}
+  .spinner{
+    width:12px; height:12px;
+    border:2px solid var(--line);
+    border-top-color:var(--teal);
+    border-radius:50%;
+    animation:spin .7s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  .history-item{
+    padding:.9rem 0;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-title{font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; margin-bottom:.2rem;}
+  .history-meta{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
+  .history-empty{font-size:13px; color:var(--ink-soft);}
+
+  footer{
+    margin-top:2.5rem;
+    padding-top:1rem;
+    border-top:1px solid var(--line);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:#9A9584;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="kicker">Record · Transcribe · Summarize</div>
+    <h1>Lecture Notes</h1>
+  </header>
+
+  <div id="unsupported-warning" class="warning-box" style="display:none;">
+    Live transcription needs Chrome or Edge. You can still record here, but the transcript and notes features won't work in this browser.
+  </div>
+  <div id="mic-error" class="error-box" style="display:none;"></div>
+
+  <div class="card">
+    <label class="field-label" for="lecture-title">Lecture title</label>
+    <input type="text" id="lecture-title" placeholder="e.g. Con Law — Week 6, Equal Protection">
+
+    <div class="record-row">
+      <button class="record-btn" id="record-btn">
+        <span class="dot" id="record-dot"></span>
+        <span id="record-label">Start recording</span>
+      </button>
+      <span class="timer" id="timer">00:00</span>
+    </div>
+
+    <div class="section-label">Live transcript</div>
+    <div class="transcript-box empty" id="transcript-box">Nothing recorded yet.</div>
+  </div>
+
+  <div class="card" id="notes-card" style="display:none;">
+    <div class="record-row" style="justify-content:space-between;">
+      <button class="primary-btn" id="generate-btn">Generate notes</button>
+      <button class="secondary-btn" id="save-btn" disabled>Save lecture</button>
+    </div>
+    <div class="loading" id="notes-loading"><div class="spinner"></div><span>Organizing your notes…</span></div>
+    <div id="notes-output"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">Past lectures</div>
+    <div id="history-list"><div class="history-empty">No saved lectures yet.</div></div>
+  </div>
+
+  <footer>Lecture Notes — private study tool</footer>
+</div>
+
+<script>
+let recognition = null;
+let isRecording = false;
+let finalTranscript = '';
+let interimTranscript = '';
+let startTime = null;
+let timerInterval = null;
+let currentNotes = '';
+let currentLectureId = null;
+
+const recordBtn = document.getElementById('record-btn');
+const recordDot = document.getElementById('record-dot');
+const recordLabel = document.getElementById('record-label');
+const timerEl = document.getElementById('timer');
+const transcriptBox = document.getElementById('transcript-box');
+const notesCard = document.getElementById('notes-card');
+const generateBtn = document.getElementById('generate-btn');
+const saveBtn = document.getElementById('save-btn');
+const notesLoading = document.getElementById('notes-loading');
+const notesOutput = document.getElementById('notes-output');
+const micError = document.getElementById('mic-error');
+
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+if (!SpeechRecognition) {
+  document.getElementById('unsupported-warning').style.display = 'block';
+  recordBtn.disabled = true;
+} else {
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+
+  recognition.onresult = (event) => {
+    interimTranscript = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const transcriptPiece = event.results[i][0].transcript;
+      if (event.results[i].isFinal) {
+        finalTranscript += transcriptPiece + ' ';
+      } else {
+        interimTranscript += transcriptPiece;
+      }
+    }
+    renderTranscript();
+  };
+
+  recognition.onerror = (event) => {
+    console.error('Speech recognition error', event.error);
+    if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+      micError.style.display = 'block';
+      micError.textContent = "Microphone access was blocked. Check your browser's site permissions for this page and allow microphone access, then try again.";
+      stopRecording();
+    } else if (event.error === 'no-speech') {
+      // Silence is fine, recognition will keep listening.
+    } else {
+      micError.style.display = 'block';
+      micError.textContent = 'Something went wrong with the microphone (' + event.error + '). Try again.';
+    }
+  };
+
+  recognition.onend = () => {
+    if (isRecording) {
+      try { recognition.start(); } catch (e) { /* already started */ }
+    }
+  };
+}
+
+function renderTranscript() {
+  const combined = finalTranscript + interimTranscript;
+  if (!combined.trim()) {
+    transcriptBox.className = 'transcript-box empty';
+    transcriptBox.textContent = 'Nothing recorded yet.';
+    return;
+  }
+  transcriptBox.className = 'transcript-box';
+  transcriptBox.innerHTML = escapeHtml(finalTranscript) + '<span class="interim">' + escapeHtml(interimTranscript) + '</span>';
+  transcriptBox.scrollTop = transcriptBox.scrollHeight;
+}
+
+function escapeHtml(s) {
+  const div = document.createElement('div');
+  div.textContent = s;
+  return div.innerHTML;
+}
+
+function formatTime(totalSeconds) {
+  const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
+  const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
+  return m + ':' + s;
+}
+
+function startRecording() {
+  micError.style.display = 'none';
+  if (!recognition) return;
+  try {
+    recognition.start();
+  } catch (e) {
+    console.error(e);
+  }
+  isRecording = true;
+  startTime = Date.now();
+  timerInterval = setInterval(() => {
+    timerEl.textContent = formatTime((Date.now() - startTime) / 1000);
+  }, 500);
+
+  recordBtn.classList.add('recording');
+  recordDot.classList.add('pulsing');
+  recordLabel.textContent = 'Stop recording';
+  notesCard.style.display = 'none';
+  notesOutput.innerHTML = '';
+  saveBtn.disabled = true;
+  currentLectureId = null;
+}
+
+function stopRecording() {
+  isRecording = false;
+  if (recognition) {
+    try { recognition.stop(); } catch (e) { /* ignore */ }
+  }
+  clearInterval(timerInterval);
+
+  recordBtn.classList.remove('recording');
+  recordDot.classList.remove('pulsing');
+  recordLabel.textContent = 'Start recording';
+
+  if (finalTranscript.trim()) {
+    notesCard.style.display = 'block';
+  }
+}
+
+recordBtn.onclick = () => {
+  if (!isRecording) {
+    startRecording();
+  } else {
+    stopRecording();
+  }
+};
+
+generateBtn.onclick = async () => {
+  const transcript = finalTranscript.trim();
+  if (!transcript) return;
+
+  generateBtn.disabled = true;
+  notesLoading.classList.add('show');
+  notesOutput.innerHTML = '';
+
+  const title = document.getElementById('lecture-title').value.trim() || 'Untitled lecture';
+
+  try {
+    const response = await fetch('/api/generate-notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, transcript })
+    });
+    const parsed = await response.json();
+    if (!response.ok) {
+      throw new Error(parsed.error || 'Request failed');
+    }
+    currentNotes = parsed.notes;
+    notesOutput.innerHTML = '<div class="section-label">Notes</div><div class="notes-body">' + currentNotes + '</div>';
+    saveBtn.disabled = false;
+  } catch (err) {
+    console.error(err);
+    notesOutput.innerHTML = '<div class="error-box">Something went wrong generating notes. Try again.</div>';
+  } finally {
+    notesLoading.classList.remove('show');
+    generateBtn.disabled = false;
+  }
+};
+
+function getAllLectures() {
+  const entries = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (key && key.startsWith('lecture:')) {
+      try {
+        entries.push(JSON.parse(localStorage.getItem(key)));
+      } catch (e) { /* skip unreadable entry */ }
+    }
+  }
+  return entries;
+}
+
+function loadHistory() {
+  const list = document.getElementById('history-list');
+  const entries = getAllLectures().sort((a, b) => b.timestamp - a.timestamp);
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="history-empty">No saved lectures yet.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  entries.forEach(entry => {
+    const div = document.createElement('div');
+    div.className = 'history-item';
+    const dateStr = new Date(entry.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    div.innerHTML = `<div class="history-title">${escapeHtml(entry.title)}</div><div class="history-meta">${dateStr} · ${formatTime(entry.durationSeconds)}</div>`;
+    div.onclick = () => viewHistoryEntry(entry);
+    list.appendChild(div);
+  });
+}
+
+function viewHistoryEntry(entry) {
+  document.getElementById('lecture-title').value = entry.title;
+  finalTranscript = entry.transcript;
+  interimTranscript = '';
+  renderTranscript();
+  timerEl.textContent = formatTime(entry.durationSeconds);
+  currentNotes = entry.notes;
+  notesCard.style.display = 'block';
+  notesOutput.innerHTML = '<div class="section-label">Notes</div><div class="notes-body">' + entry.notes + '</div>';
+  saveBtn.disabled = true;
+  currentLectureId = entry.id;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+saveBtn.onclick = () => {
+  const title = document.getElementById('lecture-title').value.trim() || 'Untitled lecture';
+  const durationSeconds = startTime ? (Date.now() - startTime) / 1000 : 0;
+  const id = currentLectureId || ('l_' + Date.now());
+  const entry = {
+    id,
+    title,
+    transcript: finalTranscript.trim(),
+    notes: currentNotes,
+    durationSeconds,
+    timestamp: Date.now()
+  };
+  try {
+    localStorage.setItem('lecture:' + id, JSON.stringify(entry));
+    saveBtn.disabled = true;
+    saveBtn.textContent = 'Saved';
+    setTimeout(() => { saveBtn.textContent = 'Save lecture'; }, 1500);
+    loadHistory();
+  } catch (e) {
+    console.error(e);
+    alert('Could not save this lecture. Storage might be full or unavailable.');
+  }
+};
+
+loadHistory();
+</script>
+</body>
+</html>
