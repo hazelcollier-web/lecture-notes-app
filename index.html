@@ -3,22 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lecture Notes</title>
+<title>Question Docket — LSAT LR Analyzer</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600&display=swap');
 
   :root{
-    --paper:#F6F3EC;
+    --paper:#FBEEF3;
     --card:#FFFFFF;
-    --ink:#1E2A22;
-    --ink-soft:#5C6B60;
-    --line:#DEDACB;
-    --teal:#1F6F5C;
-    --teal-soft:#DCEBE6;
-    --amber:#C97A2B;
-    --amber-soft:#F4E3D0;
-    --red:#B23A2F;
-    --red-soft:#F3E1DE;
+    --ink:#1B2340;
+    --ink-soft:#7A6670;
+    --line:#EAD3DC;
+    --brick:#C2185B;
+    --brick-soft:#F6D9E5;
+    --brass:#D4789F;
+    --brass-soft:#FBE6EE;
+    --sage:#5C7FA3;
+    --sage-soft:#DCE6EF;
+    --plum:#7D1F3D;
+    --plum-soft:#EEDCE1;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -34,13 +36,18 @@
     border-bottom:2px solid var(--ink);
     padding-bottom:1rem;
     margin-bottom:1.75rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:1rem;
+    flex-wrap:wrap;
   }
   .kicker{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;
     letter-spacing:.12em;
     text-transform:uppercase;
-    color:var(--teal);
+    color:var(--brick);
     margin-bottom:.35rem;
   }
   h1{
@@ -49,13 +56,20 @@
     font-size:28px;
     letter-spacing:-.01em;
   }
+  .docket-no{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    text-align:right;
+  }
 
   .card{
     background:var(--card);
     border:1px solid var(--line);
-    border-radius:10px;
+    border-radius:2px;
     padding:1.5rem;
     margin-bottom:1.5rem;
+    box-shadow:0 1px 2px rgba(32,48,74,0.04);
   }
   label.field-label{
     display:block;
@@ -64,122 +78,92 @@
     text-transform:uppercase;
     letter-spacing:.08em;
     color:var(--ink-soft);
-    margin-bottom:.5rem;
+    margin-bottom:.6rem;
   }
-  input[type="text"]{
+  textarea{
     width:100%;
-    font-family:'Inter',sans-serif;
+    min-height:170px;
+    font-family:'Source Serif 4',serif;
     font-size:15px;
-    padding:.7rem .9rem;
+    line-height:1.6;
+    color:var(--ink);
     border:1px solid var(--line);
-    border-radius:8px;
-    background:#FCFBF7;
-    margin-bottom:1rem;
+    border-radius:2px;
+    padding:.85rem 1rem;
+    resize:vertical;
+    background:#FCFCFA;
   }
-  input[type="text"]:focus{outline:2px solid var(--teal); outline-offset:-1px;}
+  textarea:focus{outline:2px solid var(--brick); outline-offset:-1px;}
+  textarea::placeholder{color:#9AA5B2; font-style:italic;}
 
-  .record-row{
+  .actions{
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    gap:1rem;
-    margin-bottom:1rem;
+    margin-top:1rem;
     flex-wrap:wrap;
+    gap:.75rem;
   }
-  button.record-btn{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:13px;
-    font-weight:600;
-    letter-spacing:.04em;
-    text-transform:uppercase;
-    background:var(--teal);
-    color:#fff;
-    border:none;
-    padding:.85rem 1.5rem;
-    border-radius:30px;
-    cursor:pointer;
-    display:flex;
-    align-items:center;
-    gap:.6rem;
-    transition:background .15s;
-  }
-  button.record-btn:hover{background:#175647;}
-  button.record-btn.recording{background:var(--red);}
-  button.record-btn.recording:hover{background:#8f2e25;}
-  button.record-btn:disabled{opacity:.5; cursor:not-allowed;}
-  .dot{width:10px; height:10px; border-radius:50%; background:#fff;}
-  .dot.pulsing{animation:pulse 1.2s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
-
-  .timer{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:15px;
-    color:var(--ink-soft);
-  }
-
-  button.secondary-btn{
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-    background:none;
-    color:var(--ink-soft);
-    border:1px solid var(--line);
-    padding:.6rem 1.1rem;
-    border-radius:8px;
-    cursor:pointer;
-  }
-  button.secondary-btn:hover{border-color:var(--ink); color:var(--ink);}
-  button.secondary-btn:disabled{opacity:.4; cursor:not-allowed;}
-
+  .hint{font-size:12px; color:var(--ink-soft);}
   button.primary-btn{
     font-family:'IBM Plex Mono',monospace;
     font-size:12px;
     font-weight:600;
-    letter-spacing:.05em;
+    letter-spacing:.06em;
     text-transform:uppercase;
     background:var(--ink);
     color:var(--paper);
     border:none;
     padding:.7rem 1.4rem;
-    border-radius:8px;
+    border-radius:2px;
     cursor:pointer;
+    transition:background .15s;
   }
-  button.primary-btn:hover:not(:disabled){background:var(--teal);}
+  button.primary-btn:hover:not(:disabled){background:var(--brick);}
   button.primary-btn:disabled{opacity:.45; cursor:not-allowed;}
 
-  .transcript-box{
-    font-family:'Source Serif 4',serif;
-    font-size:14.5px;
-    line-height:1.7;
-    color:var(--ink);
-    background:#FCFBF7;
+  button.ghost-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    background:none;
+    color:var(--ink-soft);
     border:1px solid var(--line);
-    border-radius:8px;
-    padding:1rem 1.1rem;
-    max-height:220px;
-    overflow-y:auto;
-    white-space:pre-wrap;
+    padding:.55rem 1rem;
+    border-radius:2px;
+    cursor:pointer;
   }
-  .transcript-box.empty{color:var(--ink-soft); font-style:italic;}
-  .transcript-box .interim{color:var(--ink-soft);}
+  button.ghost-btn:hover{border-color:var(--ink); color:var(--ink);}
 
-  .warning-box{
-    background:var(--amber-soft);
-    border:1px solid var(--amber);
-    color:#7A4A16;
+  .error-box{
+    background:var(--brick-soft);
+    border:1px solid var(--brick);
+    color:var(--brick);
     font-size:13px;
     padding:.8rem 1rem;
-    border-radius:8px;
+    border-radius:2px;
     margin-bottom:1.5rem;
   }
-  .error-box{
-    background:var(--red-soft);
-    border:1px solid var(--red);
-    color:var(--red);
-    font-size:13px;
-    padding:.8rem 1rem;
-    border-radius:8px;
-    margin-bottom:1.5rem;
+
+  .phase{display:none;}
+  .phase.show{display:block;}
+
+  .type-stamp{
+    display:inline-flex;
+    align-items:baseline;
+    gap:.5rem;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    font-weight:600;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:.4rem .8rem;
+    border-radius:2px;
+    margin-bottom:1.25rem;
+    transform:rotate(-0.6deg);
   }
 
   .section-label{
@@ -193,42 +177,184 @@
   }
   .section-label:first-of-type{margin-top:0;}
 
-  .notes-body{
+  .stimulus-plain{
     font-family:'Source Serif 4',serif;
-    font-size:15px;
-    line-height:1.7;
+    font-size:15.5px;
+    line-height:1.75;
+    color:var(--ink);
   }
-  .notes-body h3{
-    font-family:'Inter',sans-serif;
-    font-size:14px;
-    font-weight:600;
-    color:var(--teal);
-    margin:1rem 0 .4rem;
-  }
-  .notes-body h3:first-child{margin-top:0;}
-  .notes-body ul{margin:0 0 .5rem 1.2rem;}
-  .notes-body li{margin-bottom:.3rem;}
 
-  .loading{display:none; align-items:center; gap:.6rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin:1rem 0;}
+  .annotated{
+    font-family:'Source Serif 4',serif;
+    font-size:15.5px;
+    line-height:2.1;
+  }
+  .tag{
+    padding:.05em .3em;
+    border-radius:2px;
+    position:relative;
+    cursor:default;
+  }
+  .tag::after{
+    content:attr(data-tag);
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    line-height:1;
+    margin-top:1px;
+  }
+  .tag-context{background:var(--brass-soft); color:var(--brass);}
+  .tag-context::after{content:"context"; color:var(--brass);}
+  .tag-premise{background:var(--sage-soft); color:var(--sage);}
+  .tag-premise::after{content:"premise"; color:var(--sage);}
+  .tag-conclusion{background:var(--brick-soft); color:var(--brick); font-weight:600;}
+  .tag-conclusion::after{content:"conclusion"; color:var(--brick);}
+  .tag-subsidiary{background:var(--plum-soft); color:var(--plum);}
+  .tag-subsidiary::after{content:"subsidiary conclusion"; color:var(--plum);}
+  .tag-concession{background:#EEE; color:#777; text-decoration:line-through; text-decoration-color:#bbb;}
+  .tag-concession::after{content:"concession"; color:#888; text-decoration:none;}
+
+  .legend{display:flex; flex-wrap:wrap; gap:.9rem; margin:.9rem 0 0; font-size:11px; font-family:'IBM Plex Mono',monospace; color:var(--ink-soft);}
+  .legend span{display:inline-flex; align-items:center; gap:.35rem;}
+  .swatch{width:9px; height:9px; border-radius:1px; display:inline-block;}
+
+  .test-box{
+    background:var(--paper);
+    border-left:3px solid var(--brick);
+    padding:.9rem 1rem;
+    font-size:14px;
+    line-height:1.55;
+  }
+  .test-box strong{color:var(--brick);}
+
+  .formula-box{
+    background:var(--paper);
+    border-left:3px solid var(--plum);
+    padding:.9rem 1rem;
+  }
+  .formula-generic{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--plum);
+    letter-spacing:.01em;
+    padding-bottom:.7rem;
+    margin-bottom:.7rem;
+    border-bottom:1px dashed var(--line);
+  }
+  .formula-applied-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin-bottom:.35rem;
+  }
+  .formula-applied{
+    font-family:'Source Serif 4',serif;
+    font-size:14.5px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+
+  ol.steps{list-style:none; counter-reset:step;}
+  ol.steps li{
+    counter-increment:step;
+    display:flex;
+    gap:.75rem;
+    padding:.6rem 0;
+    border-bottom:1px solid var(--line);
+    font-size:14.5px;
+    line-height:1.5;
+  }
+  ol.steps li:last-child{border-bottom:none;}
+  ol.steps li::before{
+    content:counter(step);
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:12px;
+    color:var(--brick);
+    border:1px solid var(--brick);
+    border-radius:50%;
+    width:20px; height:20px;
+    flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:.1rem;
+  }
+
+  ul.traps{list-style:none;}
+  ul.traps li{
+    display:flex;
+    gap:.6rem;
+    font-size:14px;
+    padding:.4rem 0;
+    color:var(--ink-soft);
+  }
+  ul.traps li::before{content:"⚠"; color:var(--brick); flex-shrink:0;}
+
+  .choices{margin-top:.5rem;}
+  .choice-row{
+    display:flex;
+    gap:.75rem;
+    align-items:flex-start;
+    padding:.6rem .75rem;
+    border-radius:2px;
+    margin-bottom:.4rem;
+    font-size:14px;
+    line-height:1.5;
+  }
+  .choice-row.correct{background:var(--sage-soft);}
+  .choice-row.wrong{background:#F5F5F3;}
+  .choice-letter{
+    font-family:'IBM Plex Mono',monospace;
+    font-weight:600;
+    font-size:12px;
+    flex-shrink:0;
+    width:1.4em;
+  }
+  .choice-row.correct .choice-letter{color:var(--sage);}
+  .choice-row.wrong .choice-letter{color:var(--ink-soft);}
+  .choice-verdict{font-size:11px; text-transform:uppercase; letter-spacing:.05em; font-family:'IBM Plex Mono',monospace; margin-bottom:2px; display:block;}
+  .choice-row.correct .choice-verdict{color:var(--sage);}
+  .choice-row.wrong .choice-verdict{color:var(--ink-soft);}
+
+  .loading{display:none; align-items:center; gap:.6rem; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft); margin-bottom:1.5rem;}
   .loading.show{display:flex;}
   .spinner{
     width:12px; height:12px;
     border:2px solid var(--line);
-    border-top-color:var(--teal);
+    border-top-color:var(--brick);
     border-radius:50%;
     animation:spin .7s linear infinite;
   }
   @keyframes spin{to{transform:rotate(360deg);}}
 
-  .history-item{
-    padding:.9rem 0;
-    border-bottom:1px solid var(--line);
-    cursor:pointer;
+  .log-card{margin-top:2rem;}
+  .log-title{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px; text-transform:uppercase; letter-spacing:.08em;
+    color:var(--ink-soft); margin-bottom:.85rem;
   }
-  .history-item:last-child{border-bottom:none;}
-  .history-title{font-family:'Inter',sans-serif; font-weight:600; font-size:14.5px; margin-bottom:.2rem;}
-  .history-meta{font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-soft);}
-  .history-empty{font-size:13px; color:var(--ink-soft);}
+  .tally-grid{display:flex; flex-wrap:wrap; gap:.5rem;}
+  .tally-pill{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:.3rem .7rem;
+    color:var(--ink-soft);
+    background:#FAFAF8;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .tally-pill:hover{border-color:var(--ink); background:#fff;}
+  .tally-pill b{color:var(--ink);}
+  .clear-log{
+    background:none; border:none; color:var(--ink-soft);
+    font-family:'IBM Plex Mono',monospace; font-size:11px;
+    text-decoration:underline; cursor:pointer; margin-top:.75rem;
+  }
 
   footer{
     margin-top:2.5rem;
@@ -236,296 +362,788 @@
     border-top:1px solid var(--line);
     font-family:'IBM Plex Mono',monospace;
     font-size:10.5px;
-    color:#9A9584;
+    color:#9AA5B2;
     text-align:center;
+  }
+
+  /* --- Quiz: type guess --- */
+  .type-group-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--ink-soft);
+    margin:1rem 0 .5rem;
+  }
+  .type-group-label:first-child{margin-top:0;}
+  .type-group-sub{font-weight:400; text-transform:none; letter-spacing:0; color:#9AA5B2;}
+  .type-grid{
+    display:grid;
+    grid-template-columns:repeat(2, 1fr);
+    gap:.6rem;
+  }
+  @media (max-width:520px){ .type-grid{grid-template-columns:1fr;} }
+  .type-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    text-align:left;
+    padding:.75rem .9rem;
+    border:1px solid var(--line);
+    background:#FCFCFA;
+    border-radius:2px;
+    cursor:pointer;
+    color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .type-btn:hover:not(:disabled){border-color:var(--ink);}
+  .type-btn:disabled{cursor:default;}
+  .type-btn.chosen-correct{background:var(--sage-soft); border-color:var(--sage); color:var(--sage);}
+  .type-btn.chosen-wrong{background:var(--brick-soft); border-color:var(--brick); color:var(--brick);}
+  .type-btn.reveal-correct{background:var(--sage-soft); border-color:var(--sage); color:var(--sage);}
+
+  .guess-feedback{
+    margin-top:1rem;
+    font-size:13.5px;
+    padding:.75rem 1rem;
+    border-radius:2px;
+    display:none;
+  }
+  .guess-feedback.show{display:block;}
+  .guess-feedback.correct{background:var(--sage-soft); color:var(--sage);}
+  .guess-feedback.wrong{background:var(--brick-soft); color:var(--brick);}
+
+  .formula-choice-list{display:flex; flex-direction:column; gap:.6rem;}
+  .formula-choice-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    line-height:1.5;
+    text-align:left;
+    padding:.8rem .95rem;
+    border:1px solid var(--line);
+    background:#FCFCFA;
+    border-radius:2px;
+    cursor:pointer;
+    color:var(--ink);
+    transition:border-color .15s, background .15s;
+  }
+  .formula-choice-btn:hover:not(:disabled){border-color:var(--ink);}
+  .formula-choice-btn:disabled{cursor:default;}
+  .formula-choice-btn.chosen-correct{background:var(--sage-soft); border-color:var(--sage); color:var(--sage);}
+  .formula-choice-btn.chosen-wrong{background:var(--brick-soft); border-color:var(--brick); color:var(--brick);}
+  .formula-choice-btn.reveal-correct{background:var(--sage-soft); border-color:var(--sage); color:var(--sage);}
+
+  /* --- Quiz: sorting exercise --- */
+  .slot-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:.5rem;
+    margin-bottom:1.25rem;
+  }
+  .slot-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    padding:.5rem .8rem;
+    border-radius:20px;
+    border:1.5px solid;
+    cursor:pointer;
+    background:#fff;
+  }
+  .slot-context{border-color:var(--brass); color:var(--brass);}
+  .slot-premise{border-color:var(--sage); color:var(--sage);}
+  .slot-subsidiary{border-color:var(--plum); color:var(--plum);}
+  .slot-conclusion{border-color:var(--brick); color:var(--brick);}
+  .slot-concession{border-color:#999; color:#777;}
+  .slot-btn.active{color:#fff;}
+  .slot-context.active{background:var(--brass);}
+  .slot-premise.active{background:var(--sage);}
+  .slot-subsidiary.active{background:var(--plum);}
+  .slot-conclusion.active{background:var(--brick);}
+  .slot-concession.active{background:#888;}
+  .slot-btn:disabled{opacity:.4; cursor:not-allowed;}
+
+  .chip-list{display:flex; flex-direction:column; gap:.5rem;}
+  .chip{
+    font-family:'Source Serif 4',serif;
+    font-size:14.5px;
+    line-height:1.5;
+    padding:.7rem .85rem;
+    border:1px solid var(--line);
+    border-radius:2px;
+    background:#FCFCFA;
+    cursor:pointer;
+    transition:border-color .15s, background .15s;
+  }
+  .chip.selected{border-color:var(--ink); border-width:2px; background:#fff;}
+  .chip.assigned{opacity:.75;}
+  .chip-tagline{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+    margin-top:.3rem;
+    display:block;
+  }
+  .chip.assign-context{border-left:4px solid var(--brass);}
+  .chip.assign-context .chip-tagline{color:var(--brass);}
+  .chip.assign-premise{border-left:4px solid var(--sage);}
+  .chip.assign-premise .chip-tagline{color:var(--sage);}
+  .chip.assign-subsidiary{border-left:4px solid var(--plum);}
+  .chip.assign-subsidiary .chip-tagline{color:var(--plum);}
+  .chip.assign-conclusion{border-left:4px solid var(--brick);}
+  .chip.assign-conclusion .chip-tagline{color:var(--brick);}
+  .chip.assign-concession{border-left:4px solid #888;}
+  .chip.assign-concession .chip-tagline{color:#888;}
+  .chip.graded-correct{background:var(--sage-soft);}
+  .chip.graded-wrong{background:var(--brick-soft);}
+  .chip-correction{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--brick);
+    margin-top:.3rem;
+    display:block;
+  }
+  .chip-reason{
+    font-family:'Inter',sans-serif;
+    font-size:12.5px;
+    line-height:1.45;
+    color:var(--ink-soft);
+    margin-top:.4rem;
+    display:block;
+    font-style:italic;
+  }
+
+  .sort-hint{font-size:12px; color:var(--ink-soft); margin-bottom:.85rem;}
+  .sort-score{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    margin-top:1rem;
+    padding:.75rem 1rem;
+    background:var(--paper);
+    border-radius:2px;
+    display:none;
+  }
+  .sort-score.show{display:block;}
+
+  .phase-actions{display:flex; justify-content:flex-end; gap:.6rem; margin-top:1rem; flex-wrap:wrap;}
+
+  .history-item{
+    padding:.9rem 0;
+    border-bottom:1px solid var(--line);
+    cursor:pointer;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-date{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    text-transform:uppercase;
+    letter-spacing:.04em;
+    margin-bottom:.35rem;
+  }
+  .history-snippet{
+    font-family:'Source Serif 4',serif;
+    font-size:14.5px;
+    line-height:1.5;
+    color:var(--ink-soft);
+  }
+  .history-empty{
+    font-size:13px;
+    color:var(--ink-soft);
+    padding:1rem 0;
+  }
+
+  @media (max-width:480px){
+    h1{font-size:22px;}
+    .docket-no{text-align:left;}
   }
 </style>
 </head>
 <body>
 <div class="wrap">
+
   <header>
-    <div class="kicker">Record · Transcribe · Summarize</div>
-    <h1>Lecture Notes</h1>
+    <div>
+      <div class="kicker">Logical Reasoning · Question Docket</div>
+      <h1>Question Docket</h1>
+    </div>
+    <div class="docket-no" id="docket-no">No. 0000</div>
   </header>
 
-  <div id="unsupported-warning" class="warning-box" style="display:none;">
-    Live transcription needs Chrome or Edge. You can still record here, but the transcript and notes features won't work in this browser.
+  <!-- PHASE 0: input -->
+  <div class="phase show" id="phase-input">
+    <div class="card">
+      <label class="field-label" for="q-input">Paste the question — stimulus, question stem, and answer choices if you have them</label>
+      <textarea id="q-input" placeholder="e.g. Nutritionists have noticed that since the fast food boom of the 1980s, there has been a surge in obesity rates. Consequently, almost all of this surge can be attributed to decreased physical activity and changes in dietary habits.
+
+Which one of the following, if true, most weakens the argument?
+
+(A) ...
+(B) ..."></textarea>
+      <div class="actions">
+        <div class="hint">Works with just the stimulus, or the full question with choices.</div>
+        <button class="primary-btn" id="start-btn">Start practice</button>
+      </div>
+    </div>
+    <div class="loading" id="loading"><div class="spinner"></div><span id="loading-text">Reading the stimulus…</span></div>
+    <div class="error-box" id="error-box" style="display:none;"></div>
   </div>
-  <div id="mic-error" class="error-box" style="display:none;"></div>
 
-  <div class="card">
-    <label class="field-label" for="lecture-title">Lecture title</label>
-    <input type="text" id="lecture-title" placeholder="e.g. Con Law — Week 6, Equal Protection">
+  <!-- PHASE 1: guess the type -->
+  <div class="phase" id="phase-type">
+    <div class="section-label">Step 1 — What question type is this?</div>
+    <div class="card">
+      <div class="stimulus-plain" id="plain-stimulus" style="margin-bottom:1.25rem;"></div>
+      <div id="type-groups"></div>
+      <div class="guess-feedback" id="guess-feedback"></div>
+    </div>
+    <div class="phase-actions">
+      <button class="primary-btn" id="to-formula-btn" disabled>Continue to formula →</button>
+    </div>
+  </div>
 
-    <div class="record-row">
-      <button class="record-btn" id="record-btn">
-        <span class="dot" id="record-dot"></span>
-        <span id="record-label">Start recording</span>
-      </button>
-      <span class="timer" id="timer">00:00</span>
+  <!-- PHASE 1.5: guess the formula -->
+  <div class="phase" id="phase-formula">
+    <div class="type-stamp" id="type-stamp-formula"></div>
+    <div class="section-label">Step 2 — Which formula matches this type?</div>
+    <div class="card">
+      <div class="hint" style="margin-bottom:1rem;">Pick the formula that correctly describes how this question type works.</div>
+      <div class="formula-choice-list" id="formula-choice-list"></div>
+      <div class="guess-feedback" id="formula-feedback"></div>
+    </div>
+    <div class="phase-actions">
+      <button class="primary-btn" id="to-sort-btn" disabled>Continue to sorting →</button>
+    </div>
+  </div>
+
+  <!-- PHASE 2: formula + sorting -->
+  <div class="phase" id="phase-sort">
+    <div class="type-stamp" id="type-stamp-sort"></div>
+
+    <div class="section-label">Formula (confirmed)</div>
+    <div class="card formula-box">
+      <div class="formula-generic" id="formula-generic-sort"></div>
+      <div class="hint">This is the shape the correct answer needs to fit. Now sort the passage into it.</div>
     </div>
 
-    <div class="section-label">Live transcript</div>
-    <div class="transcript-box empty" id="transcript-box">Nothing recorded yet.</div>
-  </div>
-
-  <div class="card" id="notes-card" style="display:none;">
-    <div class="record-row" style="justify-content:space-between;">
-      <button class="primary-btn" id="generate-btn">Generate notes</button>
-      <button class="secondary-btn" id="save-btn" disabled>Save lecture</button>
+    <div class="section-label">Step 3 — Sort the passage into its parts</div>
+    <div class="card">
+      <div class="sort-hint">Tap a role below, then tap the sentence(s) that belong to it. Every sentence needs a role before you check your work.</div>
+      <div class="slot-row" id="slot-row"></div>
+      <div class="chip-list" id="chip-list"></div>
+      <div class="sort-score" id="sort-score"></div>
     </div>
-    <div class="loading" id="notes-loading"><div class="spinner"></div><span>Organizing your notes…</span></div>
-    <div id="notes-output"></div>
+
+    <div class="phase-actions">
+      <button class="ghost-btn" id="reset-sort-btn">Clear sorting</button>
+      <button class="primary-btn" id="check-sort-btn" disabled>Check my sorting</button>
+    </div>
   </div>
 
-  <div class="card">
-    <div class="section-label">Past lectures</div>
-    <div id="history-list"><div class="history-empty">No saved lectures yet.</div></div>
+  <!-- PHASE 3: full reveal -->
+  <div class="phase" id="phase-reveal">
+    <div class="type-stamp" id="type-stamp"></div>
+
+    <div class="section-label">Structural breakdown — correct answer</div>
+    <div class="card">
+      <div class="annotated" id="annotated"></div>
+      <div class="legend">
+        <span><span class="swatch" style="background:var(--brass);"></span>Context</span>
+        <span><span class="swatch" style="background:var(--sage);"></span>Premise</span>
+        <span><span class="swatch" style="background:var(--plum);"></span>Subsidiary conclusion</span>
+        <span><span class="swatch" style="background:var(--brick);"></span>Conclusion</span>
+        <span><span class="swatch" style="background:#999;"></span>Concession</span>
+      </div>
+    </div>
+
+    <div class="section-label">Identification test</div>
+    <div class="test-box" id="test-box"></div>
+
+    <div class="section-label">Formula applied to this question</div>
+    <div class="card formula-box">
+      <div class="formula-applied" id="formula-applied"></div>
+    </div>
+
+    <div class="section-label">How to find the answer — for this question</div>
+    <div class="card"><ol class="steps" id="steps"></ol></div>
+
+    <div class="section-label">Traps to watch for</div>
+    <div class="card"><ul class="traps" id="traps"></ul></div>
+
+    <div id="choices-section" style="display:none;">
+      <div class="section-label">Answer choices</div>
+      <div class="card"><div class="choices" id="choices"></div></div>
+    </div>
+
+    <div class="phase-actions">
+      <button class="ghost-btn" id="back-to-history-btn" style="display:none;">← Back to saved questions</button>
+      <button class="primary-btn" id="new-question-btn">Analyze another question</button>
+    </div>
   </div>
 
-  <footer>Lecture Notes — private study tool</footer>
+  <!-- PHASE 4: history list for a given type -->
+  <div class="phase" id="phase-history">
+    <div class="section-label" id="history-title">Saved questions</div>
+    <div class="card"><div id="history-list"></div></div>
+    <div class="phase-actions">
+      <button class="ghost-btn" id="history-back-btn">← Back</button>
+    </div>
+  </div>
+
+  <div class="log-card" id="log-card" style="display:none;">
+    <div class="log-title">Session log — question types seen (tap a count to review)</div>
+    <div class="tally-grid" id="tally-grid"></div>
+    <button class="clear-log" id="clear-log">Clear log</button>
+  </div>
+
+  <footer>Question Docket — private study tool</footer>
 </div>
 
 <script>
-let recognition = null;
-let isRecording = false;
-let finalTranscript = '';
-let interimTranscript = '';
-let startTime = null;
-let timerInterval = null;
-let currentNotes = '';
-let currentLectureId = null;
+const OPEN_TYPES = ["Weaken", "Strengthen", "Sufficient Assumption", "Necessary Assumption", "Paradox", "Evaluate"];
+const CLOSED_TYPES = ["Conclusion", "Must Be True", "Supported", "Flaw", "Reasoning", "Disagree", "Parallel"];
+const TYPES = OPEN_TYPES.concat(CLOSED_TYPES);
 
-const recordBtn = document.getElementById('record-btn');
-const recordDot = document.getElementById('record-dot');
-const recordLabel = document.getElementById('record-label');
-const timerEl = document.getElementById('timer');
-const transcriptBox = document.getElementById('transcript-box');
-const notesCard = document.getElementById('notes-card');
-const generateBtn = document.getElementById('generate-btn');
-const saveBtn = document.getElementById('save-btn');
-const notesLoading = document.getElementById('notes-loading');
-const notesOutput = document.getElementById('notes-output');
-const micError = document.getElementById('mic-error');
+const TAG_LABEL = {context:"Context", premise:"Premise", subsidiary:"Subsidiary conclusion", conclusion:"Conclusion", concession:"Concession"};
 
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+const FORMULAS = {
+  "Weaken": "Assumption + [new fact] = assumption breaks \u2192 gap reopens \u2192 argument gets weaker.",
+  "Strengthen": "Assumption + [new fact] = gap closes \u2192 argument gets stronger.",
+  "Sufficient Assumption": "Premise + [Sufficient Assumption] \u2192 Conclusion is GUARANTEED. Test: does adding this answer make the conclusion airtight?",
+  "Necessary Assumption": "Premise + Assumption \u2192 Conclusion. Test: Premise + NOT-Assumption \u2192 Conclusion collapses.",
+  "Paradox": "Fact A + Fact B (seem to conflict) + [explanation] \u2192 both true at once, no real contradiction.",
+  "Evaluate": "Ask [Question] \u2192 Answer YES vs NO \u2192 argument's strength changes either way. Test: does the answer swing the argument?",
+  "Conclusion": "Premise(s) \u2192 Conclusion. Ask \"why should I believe this?\" \u2014 the answer is the premise, the target is the conclusion.",
+  "Must Be True": "Premises (all true) \u2192 Conclusion must be true. Negate the answer \u2014 if it contradicts a premise, it's correct.",
+  "Supported": "Premises \u2192 the BEST-supported inference among the choices, even if not airtight. Test: which choice has the strongest textual backing?",
+  "Flaw": "Premise \u21CF Conclusion, because the argument assumes [X] without justification.",
+  "Reasoning": "Argument uses [technique] to move from premise to conclusion \u2192 correct answer names that technique neutrally, without judging it.",
+  "Disagree": "Speaker A affirms [X]; Speaker B denies [X] \u2192 correct answer is the exact claim they'd answer oppositely.",
+  "Parallel": "Original argument's structure (premise types + logical connectors + conclusion strength) \u2192 find the answer choice with the identical skeleton, regardless of subject matter."
+};
 
-if (!SpeechRecognition) {
-  document.getElementById('unsupported-warning').style.display = 'block';
-  recordBtn.disabled = true;
-} else {
-  recognition = new SpeechRecognition();
-  recognition.continuous = true;
-  recognition.interimResults = true;
-  recognition.lang = 'en-US';
-
-  recognition.onresult = (event) => {
-    interimTranscript = '';
-    for (let i = event.resultIndex; i < event.results.length; i++) {
-      const transcriptPiece = event.results[i][0].transcript;
-      if (event.results[i].isFinal) {
-        finalTranscript += transcriptPiece + ' ';
-      } else {
-        interimTranscript += transcriptPiece;
-      }
-    }
-    renderTranscript();
-  };
-
-  recognition.onerror = (event) => {
-    console.error('Speech recognition error', event.error);
-    if (event.error === 'not-allowed' || event.error === 'permission-denied') {
-      micError.style.display = 'block';
-      micError.textContent = "Microphone access was blocked. Check your browser's site permissions for this page and allow microphone access, then try again.";
-      stopRecording();
-    } else if (event.error === 'no-speech') {
-      // Silence is fine, recognition will keep listening.
-    } else {
-      micError.style.display = 'block';
-      micError.textContent = 'Something went wrong with the microphone (' + event.error + '). Try again.';
-    }
-  };
-
-  recognition.onend = () => {
-    if (isRecording) {
-      try { recognition.start(); } catch (e) { /* already started */ }
-    }
-  };
-}
-
-function renderTranscript() {
-  const combined = finalTranscript + interimTranscript;
-  if (!combined.trim()) {
-    transcriptBox.className = 'transcript-box empty';
-    transcriptBox.textContent = 'Nothing recorded yet.';
-    return;
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
   }
-  transcriptBox.className = 'transcript-box';
-  transcriptBox.innerHTML = escapeHtml(finalTranscript) + '<span class="interim">' + escapeHtml(interimTranscript) + '</span>';
-  transcriptBox.scrollTop = transcriptBox.scrollHeight;
+  return a;
 }
 
-function escapeHtml(s) {
+let sessionLog = []; // array of {id, question_type, timestamp, result}
+let currentResult = null;
+let assignments = {}; // segmentId -> tag
+let activeSlot = null;
+let historyType = null;
+
+function setDocketNo(){
+  document.getElementById('docket-no').textContent = 'No. ' + String(Math.floor(1000 + Math.random()*8999));
+}
+setDocketNo();
+
+function makeId(){
+  return 'q_' + Date.now() + '_' + Math.floor(Math.random()*100000);
+}
+
+function loadLog(){
+  try{
+    const raw = localStorage.getItem('lsat-docket-log');
+    if(raw){
+      const parsed = JSON.parse(raw);
+      sessionLog = parsed.map(entry =>
+        typeof entry === 'string' ? { id: makeId(), question_type: entry, timestamp: Date.now(), result: null } : entry
+      );
+    }
+  }catch(e){ sessionLog = []; }
+  renderLog();
+}
+function addLogEntry(result){
+  sessionLog.push({ id: makeId(), question_type: result.question_type, timestamp: Date.now(), result });
+  saveLog();
+  renderLog();
+}
+function saveLog(){
+  try{ localStorage.setItem('lsat-docket-log', JSON.stringify(sessionLog)); }catch(e){ /* ignore */ }
+}
+function renderLog(){
+  const card = document.getElementById('log-card');
+  if(sessionLog.length === 0){ card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  const tally = {};
+  sessionLog.forEach(entry => { tally[entry.question_type] = (tally[entry.question_type]||0) + 1; });
+  const grid = document.getElementById('tally-grid');
+  grid.innerHTML = '';
+  Object.entries(tally)
+    .sort((a,b)=>b[1]-a[1])
+    .forEach(([type,count]) => {
+      const pill = document.createElement('button');
+      pill.className = 'tally-pill';
+      pill.innerHTML = `${type} <b>${count}</b>`;
+      pill.onclick = () => openHistory(type);
+      grid.appendChild(pill);
+    });
+}
+document.getElementById('clear-log').onclick = () => {
+  sessionLog = [];
+  saveLog();
+  renderLog();
+};
+loadLog();
+
+function showPhase(id){
+  document.querySelectorAll('.phase').forEach(p => p.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function escapeButKeepNone(s){
+  if(!s) return '';
   const div = document.createElement('div');
   div.textContent = s;
   return div.innerHTML;
 }
 
-function formatTime(totalSeconds) {
-  const m = Math.floor(totalSeconds / 60).toString().padStart(2, '0');
-  const s = Math.floor(totalSeconds % 60).toString().padStart(2, '0');
-  return m + ':' + s;
-}
+// ---------- PHASE 0: fetch ----------
+const startBtn = document.getElementById('start-btn');
+const loading = document.getElementById('loading');
+const loadingText = document.getElementById('loading-text');
+const errorBox = document.getElementById('error-box');
+const loadingMsgs = ['Reading the stimulus…','Locating the conclusion…','Checking premise support…','Running the identification test…'];
 
-function startRecording() {
-  micError.style.display = 'none';
-  if (!recognition) return;
-  try {
-    recognition.start();
-  } catch (e) {
-    console.error(e);
-  }
-  isRecording = true;
-  startTime = Date.now();
-  timerInterval = setInterval(() => {
-    timerEl.textContent = formatTime((Date.now() - startTime) / 1000);
-  }, 500);
-
-  recordBtn.classList.add('recording');
-  recordDot.classList.add('pulsing');
-  recordLabel.textContent = 'Stop recording';
-  notesCard.style.display = 'none';
-  notesOutput.innerHTML = '';
-  saveBtn.disabled = true;
-  currentLectureId = null;
-}
-
-function stopRecording() {
-  isRecording = false;
-  if (recognition) {
-    try { recognition.stop(); } catch (e) { /* ignore */ }
-  }
-  clearInterval(timerInterval);
-
-  recordBtn.classList.remove('recording');
-  recordDot.classList.remove('pulsing');
-  recordLabel.textContent = 'Start recording';
-
-  if (finalTranscript.trim()) {
-    notesCard.style.display = 'block';
-  }
-}
-
-recordBtn.onclick = () => {
-  if (!isRecording) {
-    startRecording();
-  } else {
-    stopRecording();
-  }
-};
-
-generateBtn.onclick = async () => {
-  const transcript = finalTranscript.trim();
-  if (!transcript) return;
-
-  generateBtn.disabled = true;
-  notesLoading.classList.add('show');
-  notesOutput.innerHTML = '';
-
-  const title = document.getElementById('lecture-title').value.trim() || 'Untitled lecture';
-
-  try {
-    const response = await fetch('/api/generate-notes', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title, transcript })
-    });
-    const parsed = await response.json();
-    if (!response.ok) {
-      throw new Error(parsed.error || 'Request failed');
-    }
-    currentNotes = parsed.notes;
-    notesOutput.innerHTML = '<div class="section-label">Notes</div><div class="notes-body">' + currentNotes + '</div>';
-    saveBtn.disabled = false;
-  } catch (err) {
-    console.error(err);
-    notesOutput.innerHTML = '<div class="error-box">Something went wrong generating notes. Try again.</div>';
-  } finally {
-    notesLoading.classList.remove('show');
-    generateBtn.disabled = false;
-  }
-};
-
-function getAllLectures() {
-  const entries = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    if (key && key.startsWith('lecture:')) {
-      try {
-        entries.push(JSON.parse(localStorage.getItem(key)));
-      } catch (e) { /* skip unreadable entry */ }
-    }
-  }
-  return entries;
-}
-
-function loadHistory() {
-  const list = document.getElementById('history-list');
-  const entries = getAllLectures().sort((a, b) => b.timestamp - a.timestamp);
-  if (entries.length === 0) {
-    list.innerHTML = '<div class="history-empty">No saved lectures yet.</div>';
+startBtn.onclick = async () => {
+  const input = document.getElementById('q-input').value.trim();
+  if(!input){
+    errorBox.style.display = 'block';
+    errorBox.textContent = 'Paste a question first.';
     return;
   }
-  list.innerHTML = '';
-  entries.forEach(entry => {
-    const div = document.createElement('div');
-    div.className = 'history-item';
-    const dateStr = new Date(entry.timestamp).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-    div.innerHTML = `<div class="history-title">${escapeHtml(entry.title)}</div><div class="history-meta">${dateStr} · ${formatTime(entry.durationSeconds)}</div>`;
-    div.onclick = () => viewHistoryEntry(entry);
-    list.appendChild(div);
-  });
-}
+  errorBox.style.display = 'none';
+  startBtn.disabled = true;
+  loading.classList.add('show');
+  let msgIdx = 0;
+  loadingText.textContent = loadingMsgs[0];
+  const msgInterval = setInterval(() => {
+    msgIdx = (msgIdx + 1) % loadingMsgs.length;
+    loadingText.textContent = loadingMsgs[msgIdx];
+  }, 1400);
 
-function viewHistoryEntry(entry) {
-  document.getElementById('lecture-title').value = entry.title;
-  finalTranscript = entry.transcript;
-  interimTranscript = '';
-  renderTranscript();
-  timerEl.textContent = formatTime(entry.durationSeconds);
-  currentNotes = entry.notes;
-  notesCard.style.display = 'block';
-  notesOutput.innerHTML = '<div class="section-label">Notes</div><div class="notes-body">' + entry.notes + '</div>';
-  saveBtn.disabled = true;
-  currentLectureId = entry.id;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-saveBtn.onclick = () => {
-  const title = document.getElementById('lecture-title').value.trim() || 'Untitled lecture';
-  const durationSeconds = startTime ? (Date.now() - startTime) / 1000 : 0;
-  const id = currentLectureId || ('l_' + Date.now());
-  const entry = {
-    id,
-    title,
-    transcript: finalTranscript.trim(),
-    notes: currentNotes,
-    durationSeconds,
-    timestamp: Date.now()
-  };
-  try {
-    localStorage.setItem('lecture:' + id, JSON.stringify(entry));
-    saveBtn.disabled = true;
-    saveBtn.textContent = 'Saved';
-    setTimeout(() => { saveBtn.textContent = 'Save lecture'; }, 1500);
-    loadHistory();
-  } catch (e) {
-    console.error(e);
-    alert('Could not save this lecture. Storage might be full or unavailable.');
+  try{
+    const response = await fetch('/api/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ input })
+    });
+    const parsed = await response.json();
+    if(!response.ok){
+      throw new Error(parsed.error || 'Request failed');
+    }
+    currentResult = parsed;
+    beginTypeQuiz();
+  }catch(err){
+    console.error(err);
+    errorBox.style.display = 'block';
+    errorBox.textContent = 'Something went wrong analyzing that question. Try again, or check the passage is complete.';
+  }finally{
+    clearInterval(msgInterval);
+    loading.classList.remove('show');
+    startBtn.disabled = false;
   }
 };
 
-loadHistory();
+// ---------- PHASE 1: guess the type ----------
+function beginTypeQuiz(){
+  document.getElementById('plain-stimulus').textContent = (currentResult.segments || []).map(s => s.text).join(' ');
+
+  const groupsEl = document.getElementById('type-groups');
+  groupsEl.innerHTML = '';
+
+  function buildGroup(label, sub, types){
+    const labelEl = document.createElement('div');
+    labelEl.className = 'type-group-label';
+    labelEl.innerHTML = label + ' <span class="type-group-sub">' + sub + '</span>';
+    groupsEl.appendChild(labelEl);
+
+    const grid = document.createElement('div');
+    grid.className = 'type-grid';
+    types.forEach(t => {
+      const b = document.createElement('button');
+      b.className = 'type-btn';
+      b.textContent = t;
+      b.onclick = () => handleTypeGuess(t, b);
+      grid.appendChild(b);
+    });
+    groupsEl.appendChild(grid);
+  }
+
+  buildGroup('Open', '— new info in the answer', OPEN_TYPES);
+  buildGroup('Closed', '— only what\'s in the stimulus', CLOSED_TYPES);
+
+  document.getElementById('guess-feedback').className = 'guess-feedback';
+  document.getElementById('to-formula-btn').disabled = true;
+  showPhase('phase-type');
+}
+
+function handleTypeGuess(chosen, btnEl){
+  const correct = currentResult.question_type;
+  document.querySelectorAll('.type-btn').forEach(b => b.disabled = true);
+  const feedback = document.getElementById('guess-feedback');
+  if(chosen === correct){
+    btnEl.classList.add('chosen-correct');
+    feedback.className = 'guess-feedback show correct';
+    feedback.textContent = 'Correct — this is a ' + correct + ' question.';
+  } else {
+    btnEl.classList.add('chosen-wrong');
+    document.querySelectorAll('.type-btn').forEach(b => {
+      if(b.textContent === correct) b.classList.add('reveal-correct');
+    });
+    feedback.className = 'guess-feedback show wrong';
+    feedback.textContent = 'Not quite — this is actually a ' + correct + ' question.';
+  }
+  document.getElementById('to-formula-btn').disabled = false;
+}
+
+document.getElementById('to-formula-btn').onclick = beginFormulaQuiz;
+
+// ---------- PHASE 1.5: guess the formula ----------
+function beginFormulaQuiz(){
+  const correctType = currentResult.question_type;
+  const correctFormula = currentResult.formula || FORMULAS[correctType];
+  document.getElementById('type-stamp-formula').textContent = correctType;
+
+  const otherTypes = shuffle(TYPES.filter(t => t !== correctType)).slice(0, 3);
+  const options = shuffle([
+    { type: correctType, text: correctFormula },
+    ...otherTypes.map(t => ({ type: t, text: FORMULAS[t] }))
+  ]);
+
+  const list = document.getElementById('formula-choice-list');
+  list.innerHTML = '';
+  options.forEach(opt => {
+    const b = document.createElement('button');
+    b.className = 'formula-choice-btn';
+    b.textContent = opt.text;
+    b.onclick = () => handleFormulaGuess(opt, correctFormula, b);
+    list.appendChild(b);
+  });
+  document.getElementById('formula-feedback').className = 'guess-feedback';
+  document.getElementById('to-sort-btn').disabled = true;
+  showPhase('phase-formula');
+}
+
+function handleFormulaGuess(chosenOpt, correctFormula, btnEl){
+  document.querySelectorAll('.formula-choice-btn').forEach(b => b.disabled = true);
+  const feedback = document.getElementById('formula-feedback');
+  const isRight = chosenOpt.text === correctFormula;
+  if(isRight){
+    btnEl.classList.add('chosen-correct');
+    feedback.className = 'guess-feedback show correct';
+    feedback.textContent = 'Correct — that\'s the formula for this type.';
+  } else {
+    btnEl.classList.add('chosen-wrong');
+    document.querySelectorAll('.formula-choice-btn').forEach(b => {
+      if(b.textContent === correctFormula) b.classList.add('reveal-correct');
+    });
+    feedback.className = 'guess-feedback show wrong';
+    feedback.textContent = 'Not quite — the correct formula is highlighted above.';
+  }
+  document.getElementById('to-sort-btn').disabled = false;
+}
+
+document.getElementById('to-sort-btn').onclick = beginSortExercise;
+
+// ---------- PHASE 2: sort ----------
+function beginSortExercise(){
+  assignments = {};
+  activeSlot = null;
+
+  document.getElementById('type-stamp-sort').textContent = currentResult.question_type;
+  document.getElementById('formula-generic-sort').textContent = currentResult.formula || '';
+
+  const allTags = ['context', 'premise', 'subsidiary', 'conclusion', 'concession'];
+  const slotRow = document.getElementById('slot-row');
+  slotRow.innerHTML = '';
+  allTags.forEach(tag => {
+    const b = document.createElement('button');
+    b.className = 'slot-btn slot-' + tag;
+    b.textContent = TAG_LABEL[tag] || tag;
+    b.dataset.tag = tag;
+    b.onclick = () => selectSlot(tag, b);
+    slotRow.appendChild(b);
+  });
+
+  renderChips();
+  document.getElementById('sort-score').className = 'sort-score';
+  document.getElementById('check-sort-btn').disabled = true;
+  showPhase('phase-sort');
+}
+
+function selectSlot(tag, btnEl){
+  document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('active'));
+  if(activeSlot === tag){
+    activeSlot = null;
+  } else {
+    activeSlot = tag;
+    btnEl.classList.add('active');
+  }
+}
+
+function renderChips(){
+  const list = document.getElementById('chip-list');
+  list.innerHTML = '';
+  (currentResult.segments || []).forEach(seg => {
+    const div = document.createElement('div');
+    const assignedTag = assignments[seg.id];
+    div.className = 'chip' + (assignedTag ? ' assigned assign-' + assignedTag : '');
+    div.dataset.id = seg.id;
+    div.innerHTML = escapeButKeepNone(seg.text) + (assignedTag ? `<span class="chip-tagline">${TAG_LABEL[assignedTag]}</span>` : '');
+    div.onclick = () => assignChip(seg.id);
+    list.appendChild(div);
+  });
+  updateCheckBtn();
+}
+
+function assignChip(segId){
+  if(!activeSlot) return;
+  assignments[segId] = activeSlot;
+  renderChips();
+}
+
+function updateCheckBtn(){
+  const total = (currentResult.segments || []).length;
+  const done = Object.keys(assignments).length;
+  document.getElementById('check-sort-btn').disabled = done < total;
+}
+
+document.getElementById('reset-sort-btn').onclick = () => {
+  assignments = {};
+  document.getElementById('sort-score').className = 'sort-score';
+  renderChips();
+};
+
+document.getElementById('check-sort-btn').onclick = () => {
+  let correctCount = 0;
+  const total = (currentResult.segments || []).length;
+  const list = document.getElementById('chip-list');
+  list.innerHTML = '';
+  (currentResult.segments || []).forEach(seg => {
+    const div = document.createElement('div');
+    const userTag = assignments[seg.id];
+    const isRight = userTag === seg.tag;
+    if(isRight) correctCount++;
+    div.className = 'chip assigned assign-' + userTag + ' ' + (isRight ? 'graded-correct' : 'graded-wrong');
+    let html = escapeButKeepNone(seg.text) + `<span class="chip-tagline">${TAG_LABEL[userTag] || userTag}</span>`;
+    if(!isRight){
+      html += `<span class="chip-correction">Correct role: ${TAG_LABEL[seg.tag]}</span>`;
+    }
+    if(seg.reason){
+      html += `<span class="chip-reason">${escapeButKeepNone(seg.reason)}</span>`;
+    }
+    div.innerHTML = html;
+    list.appendChild(div);
+  });
+  const scoreBox = document.getElementById('sort-score');
+  scoreBox.className = 'sort-score show';
+  scoreBox.textContent = `You sorted ${correctCount} of ${total} sentences correctly.`;
+  document.getElementById('check-sort-btn').disabled = true;
+
+  const revealBtn = document.createElement('button');
+  revealBtn.className = 'primary-btn';
+  revealBtn.style.marginTop = '1rem';
+  revealBtn.textContent = 'Reveal full analysis →';
+  revealBtn.onclick = revealFull;
+  scoreBox.appendChild(document.createElement('br'));
+  scoreBox.appendChild(revealBtn);
+};
+
+// ---------- PHASE 3: full reveal ----------
+function renderRevealUI(p){
+  document.getElementById('type-stamp').textContent = p.question_type;
+
+  const annotated = (p.segments || []).map(seg =>
+    `<span class="tag tag-${seg.tag}" data-tag="${TAG_LABEL[seg.tag] ? TAG_LABEL[seg.tag].toLowerCase() : seg.tag}">${escapeButKeepNone(seg.text)}</span>`
+  ).join(' ');
+  document.getElementById('annotated').innerHTML = annotated;
+
+  document.getElementById('test-box').innerHTML = '<strong>Test —</strong> ' + escapeButKeepNone(p.identification_test);
+  document.getElementById('formula-applied').textContent = p.formula_applied || '';
+  document.getElementById('steps').innerHTML = (p.steps||[]).map(s => `<li>${escapeButKeepNone(s)}</li>`).join('');
+  document.getElementById('traps').innerHTML = (p.traps||[]).map(t => `<li>${escapeButKeepNone(t)}</li>`).join('');
+
+  const choicesSection = document.getElementById('choices-section');
+  const choicesEl = document.getElementById('choices');
+  if(p.answer_analysis && p.answer_analysis.length){
+    choicesSection.style.display = 'block';
+    choicesEl.innerHTML = p.answer_analysis.map(c => `
+      <div class="choice-row ${c.verdict === 'correct' ? 'correct' : 'wrong'}">
+        <span class="choice-letter">(${c.letter})</span>
+        <div>
+          <span class="choice-verdict">${c.verdict === 'correct' ? 'Correct' : 'Wrong'}</span>
+          ${escapeButKeepNone(c.reason)}
+        </div>
+      </div>
+    `).join('');
+  } else {
+    choicesSection.style.display = 'none';
+  }
+
+  setDocketNo();
+}
+
+function revealFull(){
+  const p = currentResult;
+  renderRevealUI(p);
+  document.getElementById('back-to-history-btn').style.display = 'none';
+  addLogEntry(p);
+  showPhase('phase-reveal');
+}
+
+document.getElementById('new-question-btn').onclick = () => {
+  document.getElementById('q-input').value = '';
+  currentResult = null;
+  showPhase('phase-input');
+};
+
+// ---------- Browsing saved questions by type ----------
+function openHistory(type){
+  historyType = type;
+  document.getElementById('history-title').textContent = type + ' — saved questions';
+  const list = document.getElementById('history-list');
+  const entries = sessionLog.filter(e => e.question_type === type).sort((a,b) => b.timestamp - a.timestamp);
+
+  if(entries.length === 0){
+    list.innerHTML = '<div class="history-empty">No saved questions of this type yet.</div>';
+  } else {
+    list.innerHTML = '';
+    entries.forEach(entry => {
+      const row = document.createElement('div');
+      row.className = 'history-item';
+      const dateStr = new Date(entry.timestamp).toLocaleString(undefined, { month:'short', day:'numeric', hour:'numeric', minute:'2-digit' });
+      const snippet = entry.result && entry.result.segments
+        ? entry.result.segments.map(s => s.text).join(' ').slice(0, 140) + '…'
+        : '(older entry — no saved detail)';
+      row.innerHTML = `<div class="history-date">${dateStr}</div><div class="history-snippet">${escapeButKeepNone(snippet)}</div>`;
+      row.onclick = () => {
+        if(!entry.result){
+          alert('This question was saved before the archive feature was added, so its full analysis wasn\'t kept — only the type. Newer questions will have the full detail.');
+          return;
+        }
+        viewArchivedEntry(entry);
+      };
+      list.appendChild(row);
+    });
+  }
+  showPhase('phase-history');
+}
+document.getElementById('history-back-btn').onclick = () => showPhase('phase-input');
+
+function viewArchivedEntry(entry){
+  renderRevealUI(entry.result);
+  document.getElementById('back-to-history-btn').style.display = 'inline-block';
+  document.getElementById('back-to-history-btn').onclick = () => openHistory(historyType);
+  showPhase('phase-reveal');
+}
 </script>
 </body>
 </html>
